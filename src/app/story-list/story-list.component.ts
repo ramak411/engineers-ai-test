@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http'
 import { Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators'
 
-  import {  from } from 'rxjs'
+  import {interval,  from } from 'rxjs'
 import { map, concatMap } from 'rxjs/operators' 
+
 
 @Component({
   selector: 'app-story-list',
@@ -14,14 +15,16 @@ import { map, concatMap } from 'rxjs/operators'
 export class StoryListComponent implements OnInit {
 
   subscription: Subscription;
-storylist: any;
+  storylist: any;
   resultone: any
   cols:any;
 
   jsonData:any;
   display:boolean=false
 
+   source = interval(10000);
   constructor( private http:HttpClient) { 
+    this.getstoryList()
 
   }
 
@@ -34,9 +37,24 @@ storylist: any;
       { field: 'author', header: 'Author' }
   ];
     
-    this.subscription = timer(0, 10000).pipe(
-      switchMap(() => this.http.get('https://hn.algolia.com/api/v1/search_by_date?tags=story'))
-    ).subscribe(result => {this.storylist = result
+  this.subscription = this.source.subscribe(val => this.getstoryList())
+    // this.subscription = timer(0, 10000).pipe(
+    //   switchMap(() => this.http.get('https://hn.algolia.com/api/v1/search_by_date?tags=story'))
+    // ).subscribe(result => {this.storylist = result
+    // console.log(this.storylist);
+    // },
+    // err=>{
+    //   alert(err.error);
+    //   console.log(err.error);
+      
+    // });
+
+  }
+  
+  getstoryList(){
+
+    this.http.get('https://hn.algolia.com/api/v1/search_by_date?tags=story')
+    .subscribe(result => {this.storylist = result
     console.log(this.storylist);
     },
     err=>{
@@ -44,9 +62,7 @@ storylist: any;
       console.log(err.error);
       
     });
-
   }
-  
 
   showdata(data){
 
@@ -57,7 +73,7 @@ storylist: any;
 
  
 ngOnDestroy() {
-  this.resultone.unsubscribe();
+  this.subscription.unsubscribe();
 }
 
 
