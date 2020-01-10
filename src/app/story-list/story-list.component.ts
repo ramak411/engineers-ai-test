@@ -38,6 +38,11 @@ storylist: any;
       switchMap(() => this.http.get('https://hn.algolia.com/api/v1/search_by_date?tags=story'))
     ).subscribe(result => {this.storylist = result
     console.log(this.storylist);
+    },
+    err=>{
+      alert(err.error);
+      console.log(err.error);
+      
     });
 
   }
